@@ -1,13 +1,23 @@
 # DPC Routing MVP
+TLDR: 
+A routing system to help people find the highest quality care at the lowest necessary cost, making independent practice a more viable option for patients and providers. 
 
-A web app that helps patients find Direct Primary Care (DPC) providers and helps providers refer patients to other DPCs or specialists.
+**Purpose**
+The direct primary care model is gaining large (and increasing) amounts of popularity. It is more affordable for patients and lower overhead for providers, subverts the need for insurance that is costly in time and energy, and commonly prevents the need for specialty care. Above all of these things, it is toward a model of healthcare that provides the highest value care at the lowest necessary cost, toward the goal of a medical system that is profitable and accessible. 
+
+**Why this tool? **
+The majority of direct primary care providers simply _ run _their_ practice_. Providers are responsible for establishing tools, clients, connections with specialists, and the data infrastructure that they create. Much of the responsibility of running a practice is business-focused work that is outside their purview and takes away from their practice as a physician. They don't invest much in marketing or outbound sales, and much of the way patients find them is through word of mouth. Certainly, this works if your goal is to have a panel of 500 patients, but I am clear that there is something very special that will add a lot of value to our society when it is scaled up. 
+
+If we could give DPCs the advantages of a large network while having all the benefits of their own practice and personal relationships with their patients, the model can be scaled to meet society's needs. Certainly, this is not the only thing that would need to be done to scale the direct primary care model, but it is an appropriate first step to meeting patient and provider needs. 
+
+**what the system does**
+Hospital systems and insurance companies have (poorly made) tools that get patients in touch with providers who can meet their needs. Because DPC providers run independent practices, their patients basically work on a referral system that leaves some providers overrun with patients they can't treat and others with unmet capacity. By creating a routing system, some initial intake information can be gained from patients who can be directed to providers who have the capacity to provide care to them. For providers, patients can be routed to other care providers when they travel or need to see a specialist. This routing system will provide everyone in the direct primary care ecosystem greater flexibility and findability to increase effective capacity in the total system. 
 
 ## Stack
 
 - **Next.js 16** (App Router)
 - **Supabase** (Postgres + Auth)
 - **Tailwind CSS**
-
 ---
 
 ## Setup
