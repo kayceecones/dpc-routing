@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { strings } from '@/lib/i18n'
 
 export default function ToggleAccepting({
   providerId,
@@ -40,7 +41,7 @@ export default function ToggleAccepting({
       <span
         className={`w-2 h-2 rounded-full ${value ? 'bg-green-500' : 'bg-gray-400'}`}
       />
-      {value ? 'Accepting patients' : 'Full — click to open'}
+      {value ? strings.toggle.accepting : strings.toggle.full}
     </button>
   )
 }

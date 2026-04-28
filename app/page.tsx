@@ -1,90 +1,86 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import type { Provider } from '@/types'
+import { strings } from '@/lib/i18n'
 
-interface SearchParams {
-  q?: string
-}
+export const revalidate = 3600
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>
-}) {
-  const { q } = await searchParams
+export default async function HomePage() {
   const supabase = await createClient()
 
-  let query = supabase
-    .from('providers')
-    .select('*')
-    .eq('accepting_patients', true)
-    .order('created_at', { ascending: false })
+  const [{ count }, { data: stateRows }] = await Promise.all([
+    supabase.from('providers').select('*', { count: 'exact', head: true }),
+    supabase.from('providers').select('state').not('state', 'is', null),
+  ])
 
-  if (q) {
-    query = query.or(`city.ilike.%${q}%,state.ilike.%${q}%,zip.ilike.%${q}%`)
-  }
-
-  const { data: providers } = await query
+  const totalProviders = count ?? 0
+  const distinctStates = new Set(stateRows?.map((r) => r.state)).size
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Find a Direct Primary Care Provider
-        </h1>
-        <p className="text-gray-500">
-          Affordable, membership-based primary care — no insurance required.
-        </p>
+    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-4 py-16">
+      {/* Header */}
+      <h1 className="text-4xl font-bold text-gray-900 mb-3 tracking-tight">
+        {strings.landing.appName}
+      </h1>
+      <p className="text-gray-500 text-base mb-12 text-center max-w-sm">
+        {strings.landing.subheadline}
+      </p>
+
+      {/* Role cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl mb-14">
+        <Link
+          href="/find"
+          className="flex flex-col items-center gap-4 bg-white border border-gray-200 rounded-2xl p-8 hover:border-blue-300 hover:shadow-md transition-all group"
+        >
+          <span className="text-blue-600 group-hover:scale-110 transition-transform">
+            <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </span>
+          <span className="text-sm font-semibold text-gray-800 text-center">
+            {strings.landing.patientCard}
+          </span>
+        </Link>
+
+        <Link
+          href="/login"
+          className="flex flex-col items-center gap-4 bg-white border border-gray-200 rounded-2xl p-8 hover:border-blue-300 hover:shadow-md transition-all group"
+        >
+          <span className="text-blue-600 group-hover:scale-110 transition-transform">
+            <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 4v4a5 5 0 0010 0V4" />
+              <line x1="7" y1="4" x2="7" y2="2" />
+              <line x1="17" y1="4" x2="17" y2="2" />
+              <path d="M12 13v2" />
+              <path d="M12 15q0 4.5 4.5 4.5" />
+              <circle cx="16.5" cy="19.5" r="1.5" fill="currentColor" stroke="none" />
+            </svg>
+          </span>
+          <span className="text-sm font-semibold text-gray-800 text-center">
+            {strings.landing.providerCard}
+          </span>
+        </Link>
       </div>
 
-      <form method="GET" className="flex gap-2 max-w-xl mx-auto mb-10">
-        <input
-          type="text"
-          name="q"
-          defaultValue={q ?? ''}
-          placeholder="Search by city, state, or zip..."
-          className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700"
-        >
-          Search
-        </button>
-      </form>
-
-      {providers && providers.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {(providers as Provider[]).map((provider) => (
-            <Link
-              key={provider.id}
-              href={`/providers/${provider.id}`}
-              className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <h2 className="font-semibold text-gray-900 text-base leading-snug">
-                  {provider.name}
-                </h2>
-                <span className="ml-2 shrink-0 inline-block text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                  Accepting
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 mb-3">
-                {[provider.city, provider.state].filter(Boolean).join(', ') || 'Location not listed'}
-              </p>
-              {provider.monthly_cost != null && (
-                <p className="text-sm font-medium text-gray-700">
-                  ${provider.monthly_cost}/mo
-                </p>
-              )}
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <p className="text-center text-gray-500 py-16">
-          {q ? `No providers found for "${q}".` : 'No providers available right now.'}
+      {/* What is DPC */}
+      <div className="w-full max-w-xl mb-12">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+          {strings.landing.whatIsDpc}
         </p>
-      )}
+        <ul className="space-y-2">
+          {strings.landing.dpcBullets.map((bullet) => (
+            <li key={bullet} className="flex items-center gap-2.5 text-sm text-gray-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+              {bullet}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Stat bar */}
+      <p className="text-xs text-gray-400">
+        {strings.landing.statBar(totalProviders, distinctStates)}
+      </p>
     </div>
   )
 }

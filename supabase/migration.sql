@@ -91,6 +91,51 @@ values
   ('Dr. James Okafor', 'DPC physician focused on underserved communities in the Phoenix metro area. Fluent in English and Igbo.', '550 Desert Blvd, Phoenix, AZ 85001', 'Phoenix', 'AZ', '85001', '602-555-0404', 'jokafor@phoenixdpc.com', 'https://phoenixdpc.org', 70, 75, false),
   ('Dr. Leila Farsi', 'Concierge-style DPC practice in Seattle. Emphasis on mental health integration and whole-person care.', '900 Pine St, Seattle, WA 98101', 'Seattle', 'WA', '98101', '206-555-0505', 'lfarsi@seattledpc.com', 'https://seattledpc.com', 95, 200, true);
 
+-- Claimed column on providers
+alter table providers add column if not exists claimed boolean default false;
+
+-- Allow authenticated users to claim unclaimed profiles
+create policy "providers_claim" on providers
+  for update
+  using (user_id is null)
+  with check (auth.uid() = user_id);
+
+-- Patient inquiries table
+create table if not exists patient_inquiries (
+  id uuid primary key default gen_random_uuid(),
+  provider_id uuid references providers(id) on delete cascade,
+  patient_name text not null,
+  patient_email text not null,
+  message text,
+  created_at timestamptz default now(),
+  read boolean default false
+);
+
+alter table patient_inquiries enable row level security;
+
+-- Anyone can submit an inquiry
+create policy "inquiries_insert"
+  on patient_inquiries for insert
+  with check (true);
+
+-- Only the provider can read their own inquiries
+create policy "inquiries_read"
+  on patient_inquiries for select
+  using (
+    provider_id in (
+      select id from providers where user_id = auth.uid()
+    )
+  );
+
+-- Only the provider can update (mark as read) their own inquiries
+create policy "inquiries_update"
+  on patient_inquiries for update
+  using (
+    provider_id in (
+      select id from providers where user_id = auth.uid()
+    )
+  );
+
 -- Seed data: 5 fake specialists
 insert into specialists (name, specialty, location, city, state, phone, email)
 values

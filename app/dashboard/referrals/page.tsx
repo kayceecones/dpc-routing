@@ -3,7 +3,18 @@ import { redirect } from 'next/navigation'
 import type { Provider, Specialist, Referral } from '@/types'
 import ReferralsClient from './referrals-client'
 
-export default async function ReferralsPage() {
+interface SearchParams {
+  to_provider_id?: string
+  to_specialist_id?: string
+}
+
+export default async function ReferralsPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const { to_provider_id, to_specialist_id } = await searchParams
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -17,38 +28,37 @@ export default async function ReferralsPage() {
 
   if (!provider) redirect('/dashboard')
 
-  // Load inbox: referrals TO this provider
-  const { data: inbox } = await supabase
-    .from('referrals')
-    .select(`
-      *,
-      from_provider:from_provider_id (id, name, city, state),
-      to_provider:to_provider_id (id, name),
-      to_specialist:to_specialist_id (id, name, specialty)
-    `)
-    .eq('to_provider_id', provider.id)
-    .order('created_at', { ascending: false })
-
-  // Load open DPC providers (accepting) for search
-  const { data: dpcProviders } = await supabase
-    .from('providers')
-    .select('id, name, city, state, monthly_cost, accepting_patients')
-    .eq('accepting_patients', true)
-    .neq('id', provider.id)
-    .order('name')
-
-  // Load specialists
-  const { data: specialists } = await supabase
-    .from('specialists')
-    .select('*')
-    .order('name')
+  const [inboxResult, dpcResult, specialistsResult] = await Promise.all([
+    supabase
+      .from('referrals')
+      .select(`
+        *,
+        from_provider:from_provider_id (id, name, city, state),
+        to_provider:to_provider_id (id, name),
+        to_specialist:to_specialist_id (id, name, specialty)
+      `)
+      .eq('to_provider_id', provider.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('providers')
+      .select('id, name, city, state, monthly_cost, accepting_patients')
+      .eq('accepting_patients', true)
+      .neq('id', provider.id)
+      .order('name'),
+    supabase
+      .from('specialists')
+      .select('*')
+      .order('name'),
+  ])
 
   return (
     <ReferralsClient
       providerId={provider.id}
-      inbox={(inbox ?? []) as Referral[]}
-      dpcProviders={(dpcProviders ?? []) as Provider[]}
-      specialists={(specialists ?? []) as Specialist[]}
+      inbox={(inboxResult.data ?? []) as Referral[]}
+      dpcProviders={(dpcResult.data ?? []) as Provider[]}
+      specialists={(specialistsResult.data ?? []) as Specialist[]}
+      initialProviderId={to_provider_id}
+      initialSpecialistId={to_specialist_id}
     />
   )
 }

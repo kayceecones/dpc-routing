@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
+import { strings } from '@/lib/i18n'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-sm mx-auto px-4 py-20">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">Log in</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">{strings.login.title}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
@@ -40,7 +41,7 @@ export default function LoginPage() {
           </p>
         )}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{strings.login.email}</label>
           <input
             type="email"
             required
@@ -50,7 +51,7 @@ export default function LoginPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">{strings.login.password}</label>
           <input
             type="password"
             required
@@ -64,14 +65,14 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? 'Logging in...' : 'Log in'}
+          {loading ? strings.login.submitting : strings.login.submit}
         </button>
       </form>
 
       <p className="text-center text-sm text-gray-500 mt-6">
-        Don&apos;t have an account?{' '}
+        {strings.login.noAccount}{' '}
         <Link href="/signup" className="text-blue-600 hover:underline">
-          Sign up
+          {strings.login.signUp}
         </Link>
       </p>
     </div>

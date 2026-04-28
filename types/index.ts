@@ -27,6 +27,16 @@ export interface Specialist {
   email: string | null
 }
 
+export interface Inquiry {
+  id: string
+  provider_id: string
+  patient_name: string
+  patient_email: string
+  message: string | null
+  created_at: string
+  read: boolean
+}
+
 export interface Referral {
   id: string
   from_provider_id: string

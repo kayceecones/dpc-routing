@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { Provider } from '@/types'
+import { strings } from '@/lib/i18n'
 
 export default function ProfileForm({ provider }: { provider: Provider }) {
   const router = useRouter()
@@ -72,12 +73,12 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
       )}
       {success && (
         <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-          Profile saved.
+          {strings.profileForm.saved}
         </p>
       )}
 
       <div>
-        <label className={labelClass}>Name *</label>
+        <label className={labelClass}>{strings.profileForm.name}</label>
         <input
           type="text"
           required
@@ -88,7 +89,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
       </div>
 
       <div>
-        <label className={labelClass}>Bio</label>
+        <label className={labelClass}>{strings.profileForm.bio}</label>
         <textarea
           rows={4}
           value={form.bio}
@@ -99,7 +100,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>City</label>
+          <label className={labelClass}>{strings.profileForm.city}</label>
           <input
             type="text"
             value={form.city}
@@ -108,7 +109,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
           />
         </div>
         <div>
-          <label className={labelClass}>State</label>
+          <label className={labelClass}>{strings.profileForm.state}</label>
           <input
             type="text"
             maxLength={2}
@@ -122,7 +123,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Zip</label>
+          <label className={labelClass}>{strings.profileForm.zip}</label>
           <input
             type="text"
             value={form.zip}
@@ -131,7 +132,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
           />
         </div>
         <div>
-          <label className={labelClass}>Phone</label>
+          <label className={labelClass}>{strings.profileForm.phone}</label>
           <input
             type="tel"
             value={form.phone}
@@ -142,7 +143,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
       </div>
 
       <div>
-        <label className={labelClass}>Email</label>
+        <label className={labelClass}>{strings.profileForm.email}</label>
         <input
           type="email"
           value={form.email}
@@ -152,7 +153,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
       </div>
 
       <div>
-        <label className={labelClass}>Website</label>
+        <label className={labelClass}>{strings.profileForm.website}</label>
         <input
           type="url"
           value={form.website}
@@ -164,7 +165,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Monthly cost ($)</label>
+          <label className={labelClass}>{strings.profileForm.monthlyCost}</label>
           <input
             type="number"
             min="0"
@@ -175,7 +176,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
           />
         </div>
         <div>
-          <label className={labelClass}>Enrollment fee ($)</label>
+          <label className={labelClass}>{strings.profileForm.enrollmentFee}</label>
           <input
             type="number"
             min="0"
@@ -193,7 +194,7 @@ export default function ProfileForm({ provider }: { provider: Provider }) {
           disabled={saving}
           className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
         >
-          {saving ? 'Saving...' : 'Save profile'}
+          {saving ? strings.profileForm.saving : strings.profileForm.save}
         </button>
       </div>
     </form>
